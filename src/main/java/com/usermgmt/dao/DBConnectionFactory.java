@@ -7,13 +7,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
+import java.net.URI;
 import java.sql.*;
 import java.util.Properties;
 
 /**
  * High-performance Database Connection Factory using HikariCP.
  * Features automatic database table initialization, seed data population,
- * and seamless fallback to H2 in MySQL mode if local MySQL is offline.
+ * cloud environment variable detection (Railway/Docker), and seamless
+ * fallback to H2 in MySQL mode if MySQL is offline.
  */
 public class DBConnectionFactory {
 
@@ -46,8 +48,46 @@ public class DBConnectionFactory {
         String password = props.getProperty("db.password", "root");
         boolean fallbackEnabled = Boolean.parseBoolean(props.getProperty("db.fallback.enabled", "true"));
 
+        // 1. Resolve Cloud / Railway Environment Variables if available
+        String envMysqlUrl = System.getenv("MYSQL_URL");
+        if (isValidValue(envMysqlUrl)) {
+            try {
+                if (envMysqlUrl.startsWith("jdbc:")) {
+                    url = envMysqlUrl.trim();
+                } else {
+                    URI uri = new URI(envMysqlUrl.replace("mysql://", "http://"));
+                    String host = uri.getHost();
+                    int port = uri.getPort() != -1 ? uri.getPort() : 3306;
+                    String path = uri.getPath() != null && uri.getPath().length() > 1 ? uri.getPath().substring(1) : "railway";
+                    if (isValidHost(host)) {
+                        url = "jdbc:mysql://" + host + ":" + port + "/" + path + "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8";
+                    }
+                    if (uri.getUserInfo() != null && uri.getUserInfo().contains(":")) {
+                        String[] parts = uri.getUserInfo().split(":", 2);
+                        if (isValidValue(parts[0])) user = parts[0];
+                        if (parts.length > 1 && isValidValue(parts[1])) password = parts[1];
+                    }
+                }
+            } catch (Exception e) {
+                logger.warn("Failed to parse MYSQL_URL: {}", e.getMessage());
+            }
+        } else if (isValidValue(System.getenv("MYSQLHOST"))) {
+            String host = System.getenv("MYSQLHOST").trim();
+            if (isValidHost(host)) {
+                String port = isValidValue(System.getenv("MYSQLPORT")) ? System.getenv("MYSQLPORT").trim() : "3306";
+                String db = isValidValue(System.getenv("MYSQLDATABASE")) ? System.getenv("MYSQLDATABASE").trim() : "railway";
+                url = "jdbc:mysql://" + host + ":" + port + "/" + db + "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8";
+                if (isValidValue(System.getenv("MYSQLUSER"))) user = System.getenv("MYSQLUSER").trim();
+                if (isValidValue(System.getenv("MYSQLPASSWORD"))) password = System.getenv("MYSQLPASSWORD").trim();
+            }
+        } else if (isValidValue(System.getenv("USER_DB_URL"))) {
+            url = System.getenv("USER_DB_URL").trim();
+            if (isValidValue(System.getenv("USER_DB_USER"))) user = System.getenv("USER_DB_USER").trim();
+            if (isValidValue(System.getenv("USER_DB_PASSWORD"))) password = System.getenv("USER_DB_PASSWORD").trim();
+        }
+
         try {
-            logger.info("Attempting to connect to MySQL database at: {}", url);
+            logger.info("Attempting to connect to database at: {}", url);
             HikariConfig config = new HikariConfig();
             config.setDriverClassName(driver);
             config.setJdbcUrl(url);
@@ -77,6 +117,14 @@ public class DBConnectionFactory {
                 throw new RuntimeException("Database connection failed and fallback is disabled.", ex);
             }
         }
+    }
+
+    private static boolean isValidValue(String val) {
+        return val != null && !val.trim().isEmpty() && !val.contains("${{");
+    }
+
+    private static boolean isValidHost(String host) {
+        return host != null && !host.trim().isEmpty() && !host.equals(":") && !host.equals("/");
     }
 
     private static void initFallbackDataSource() {
