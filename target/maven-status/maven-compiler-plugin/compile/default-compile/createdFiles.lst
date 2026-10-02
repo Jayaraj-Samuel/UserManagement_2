@@ -1,0 +1,16 @@
+com\usermgmt\EmbeddedServer.class
+com\usermgmt\rest\UserResource.class
+com\usermgmt\rest\AuthResource.class
+com\usermgmt\filter\AuthenticationFilter.class
+com\usermgmt\model\User.class
+com\usermgmt\config\JerseyApplication.class
+com\usermgmt\dao\DBConnectionFactory.class
+com\usermgmt\filter\CharsetFilter.class
+com\usermgmt\model\ApiResponse.class
+com\usermgmt\dao\impl\UserDAOImpl.class
+com\usermgmt\rest\StatsResource.class
+com\usermgmt\service\impl\UserServiceImpl.class
+com\usermgmt\service\UserService.class
+com\usermgmt\dao\UserDAO.class
+com\usermgmt\util\PasswordUtil.class
+com\usermgmt\model\LoginRequest.class

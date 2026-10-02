@@ -1,0 +1,16 @@
+C:\JavaProjects\UserManagementSystem2\src\main\java\com\usermgmt\config\JerseyApplication.java
+C:\JavaProjects\UserManagementSystem2\src\main\java\com\usermgmt\dao\DBConnectionFactory.java
+C:\JavaProjects\UserManagementSystem2\src\main\java\com\usermgmt\dao\impl\UserDAOImpl.java
+C:\JavaProjects\UserManagementSystem2\src\main\java\com\usermgmt\dao\UserDAO.java
+C:\JavaProjects\UserManagementSystem2\src\main\java\com\usermgmt\EmbeddedServer.java
+C:\JavaProjects\UserManagementSystem2\src\main\java\com\usermgmt\filter\AuthenticationFilter.java
+C:\JavaProjects\UserManagementSystem2\src\main\java\com\usermgmt\filter\CharsetFilter.java
+C:\JavaProjects\UserManagementSystem2\src\main\java\com\usermgmt\model\ApiResponse.java
+C:\JavaProjects\UserManagementSystem2\src\main\java\com\usermgmt\model\LoginRequest.java
+C:\JavaProjects\UserManagementSystem2\src\main\java\com\usermgmt\model\User.java
+C:\JavaProjects\UserManagementSystem2\src\main\java\com\usermgmt\rest\AuthResource.java
+C:\JavaProjects\UserManagementSystem2\src\main\java\com\usermgmt\rest\StatsResource.java
+C:\JavaProjects\UserManagementSystem2\src\main\java\com\usermgmt\rest\UserResource.java
+C:\JavaProjects\UserManagementSystem2\src\main\java\com\usermgmt\service\impl\UserServiceImpl.java
+C:\JavaProjects\UserManagementSystem2\src\main\java\com\usermgmt\service\UserService.java
+C:\JavaProjects\UserManagementSystem2\src\main\java\com\usermgmt\util\PasswordUtil.java
