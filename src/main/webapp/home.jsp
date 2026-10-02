@@ -176,7 +176,7 @@
                 <table class="table table-custom table-hover align-middle">
                     <thead>
                         <tr>
-                            <th scope="col" style="width: 80px;">ID</th>
+                            <th scope="col" style="width: 105px;"># / ID</th>
                             <th scope="col">User</th>
                             <th scope="col">Email Address</th>
                             <th scope="col">Department</th>

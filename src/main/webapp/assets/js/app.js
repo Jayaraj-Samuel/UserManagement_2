@@ -172,7 +172,8 @@ function renderUsersTable(data) {
         return;
     }
 
-    users.forEach(function (u) {
+    users.forEach(function (u, index) {
+        const rowNum = (currentPage - 1) * currentPageSize + index + 1;
         const initials = (u.fullName || u.username).substring(0, 2).toUpperCase();
 
         // Role badge
@@ -220,7 +221,10 @@ function renderUsersTable(data) {
 
         const row = `
             <tr>
-                <td class="fw-semibold text-secondary">#${u.id}</td>
+                <td class="fw-semibold text-secondary text-nowrap">
+                    <span class="badge bg-secondary-subtle text-secondary fw-bold me-1">#${rowNum}</span>
+                    <small class="text-muted" title="Database User ID">(ID ${u.id})</small>
+                </td>
                 <td>
                     <div class="user-cell">
                         <div class="user-avatar-sm">${initials}</div>

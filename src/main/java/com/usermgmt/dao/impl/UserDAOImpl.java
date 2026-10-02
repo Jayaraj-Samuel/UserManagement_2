@@ -80,7 +80,7 @@ public class UserDAOImpl implements UserDAO {
 
         buildFilterConditions(search, role, status, sql, params);
 
-        sql.append(" ORDER BY id DESC LIMIT ? OFFSET ?");
+        sql.append(" ORDER BY id ASC LIMIT ? OFFSET ?");
         params.add(limit > 0 ? limit : 20);
         params.add(offset >= 0 ? offset : 0);
 
