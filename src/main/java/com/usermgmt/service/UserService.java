@@ -16,6 +16,8 @@ public interface UserService {
 
     List<User> listUsers(String search, String role, String status, int page, int pageSize);
 
+    List<User> listUsers(String search, String role, String status, String sortBy, String sortDir, int page, int pageSize);
+
     int getTotalUserCount(String search, String role, String status);
 
     User createUser(User user, String clientIp);

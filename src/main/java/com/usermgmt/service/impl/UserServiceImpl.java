@@ -69,9 +69,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> listUsers(String search, String role, String status, int page, int pageSize) {
+        return listUsers(search, role, status, "id", "ASC", page, pageSize);
+    }
+
+    @Override
+    public List<User> listUsers(String search, String role, String status, String sortBy, String sortDir, int page, int pageSize) {
         int limit = pageSize > 0 ? pageSize : 10;
         int offset = (page > 0 ? page - 1 : 0) * limit;
-        return userDAO.findAll(search, role, status, offset, limit);
+        return userDAO.findAll(search, role, status, sortBy, sortDir, offset, limit);
     }
 
     @Override

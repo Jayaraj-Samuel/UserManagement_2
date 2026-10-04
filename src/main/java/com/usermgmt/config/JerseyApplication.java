@@ -10,6 +10,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 public class JerseyApplication extends ResourceConfig {
 
     public JerseyApplication() {
+        //telling jersey to scan this package for REST resource classes
         packages("com.usermgmt.rest");
         register(JacksonFeature.class);
     }

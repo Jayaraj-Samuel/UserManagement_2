@@ -483,3 +483,163 @@ h1, h2, h3, h4, h5, h6, .brand-font {
     border-color: var(--primary);
     color: var(--primary);
 }
+
+/* ====================================================================
+   Hamburger Menu & App Offcanvas Sidebar
+   ==================================================================== */
+html {
+    scroll-behavior: smooth;
+}
+
+.hamburger-btn {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    color: var(--text-primary);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s ease;
+}
+
+.hamburger-btn:hover {
+    background: var(--primary-light);
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.hamburger-btn:focus {
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+}
+
+.app-sidebar {
+    width: 320px !important;
+    background: #ffffff;
+    border-right: 1px solid var(--border-color);
+    box-shadow: var(--shadow-xl);
+}
+
+.app-sidebar .offcanvas-header {
+    background: #ffffff;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-user-card {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 1px solid var(--border-color);
+    transition: all 0.2s ease;
+}
+
+.sidebar-user-card:hover {
+    background: linear-gradient(135deg, #f5f7ff 0%, #eef2ff 100%);
+    border-color: #c7d2fe;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.avatar-circle.avatar-lg {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.sidebar-nav .sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.7rem 0.95rem;
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.sidebar-icon-wrap {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1f5f9;
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.sidebar-nav .sidebar-link:hover {
+    background-color: #f1f5f9;
+    color: var(--primary);
+    transform: translateX(3px);
+}
+
+.sidebar-nav .sidebar-link:hover .sidebar-icon-wrap {
+    background-color: var(--primary-light);
+    color: var(--primary);
+}
+
+.sidebar-nav .sidebar-link.active {
+    background-color: var(--primary-light);
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.sidebar-nav .sidebar-link.active .sidebar-icon-wrap {
+    background-color: var(--primary);
+    color: #ffffff;
+    box-shadow: 0 4px 8px rgba(79, 70, 229, 0.25);
+}
+
+/* ====================================================================
+   Table Sorting Aesthetics
+   ==================================================================== */
+.sortable-th {
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.sortable-th:hover {
+    background-color: #f1f5f9 !important;
+    color: var(--primary) !important;
+}
+
+.sortable-th.active-sort {
+    background-color: #f0f4ff !important;
+    color: var(--primary) !important;
+}
+
+.sortable-th.active-sort .sort-th-icon {
+    color: var(--primary) !important;
+    font-weight: bold;
+}
+
+.sort-th-icon {
+    font-size: 0.85rem;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.sortable-th:hover .sort-th-icon {
+    color: var(--primary) !important;
+}
+
+/* Highlight pulse for smooth navigation anchor */
+@keyframes highlightSection {
+    0% { outline: 2px solid var(--primary); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.2); }
+    100% { outline: 2px solid transparent; box-shadow: none; }
+}
+
+.section-highlight {
+    animation: highlightSection 1.2s ease-out;
+}

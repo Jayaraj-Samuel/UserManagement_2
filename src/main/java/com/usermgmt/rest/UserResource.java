@@ -39,12 +39,14 @@ public class UserResource {
             @QueryParam("search") String search,
             @QueryParam("role") String role,
             @QueryParam("status") String status,
+            @QueryParam("sortBy") @DefaultValue("id") String sortBy,
+            @QueryParam("sortDir") @DefaultValue("ASC") String sortDir,
             @QueryParam("page") @DefaultValue("1") int page,
             @QueryParam("pageSize") @DefaultValue("10") int pageSize,
             @Context HttpServletRequest request) {
 
         int totalCount = userService.getTotalUserCount(search, role, status);
-        List<User> users = userService.listUsers(search, role, status, page, pageSize);
+        List<User> users = userService.listUsers(search, role, status, sortBy, sortDir, page, pageSize);
 
         int totalPages = (int) Math.ceil((double) totalCount / pageSize);
         if (totalPages == 0) totalPages = 1;
@@ -55,6 +57,8 @@ public class UserResource {
         result.put("totalPages", totalPages);
         result.put("currentPage", page);
         result.put("pageSize", pageSize);
+        result.put("sortBy", sortBy != null ? sortBy : "id");
+        result.put("sortDir", sortDir != null ? sortDir.toUpperCase() : "ASC");
 
         return Response.ok(ApiResponse.ok("Users retrieved successfully", result)).build();
     }

@@ -74,13 +74,59 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public List<User> findAll(String search, String role, String status, int offset, int limit) {
+        return findAll(search, role, status, "id", "ASC", offset, limit);
+    }
+
+    @Override
+    public List<User> findAll(String search, String role, String status, String sortBy, String sortDir, int offset, int limit) {
         List<User> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder("SELECT id, username, full_name, email, password_hash, salt, role, status, phone, department, created_at, updated_at FROM users WHERE 1=1 ");
         List<Object> params = new ArrayList<>();
 
         buildFilterConditions(search, role, status, sql, params);
 
-        sql.append(" ORDER BY id ASC LIMIT ? OFFSET ?");
+        // Strict whitelist for sort column to prevent SQL injection
+        String sortColumn;
+        if (sortBy == null) sortBy = "id";
+        switch (sortBy.trim().toLowerCase()) {
+            case "fullname":
+            case "name":
+            case "full_name":
+                sortColumn = "full_name";
+                break;
+            case "username":
+                sortColumn = "username";
+                break;
+            case "email":
+                sortColumn = "email";
+                break;
+            case "department":
+                sortColumn = "department";
+                break;
+            case "role":
+                sortColumn = "role";
+                break;
+            case "status":
+                sortColumn = "status";
+                break;
+            case "created_at":
+            case "created":
+            case "date":
+                sortColumn = "created_at";
+                break;
+            case "id":
+            default:
+                sortColumn = "id";
+                break;
+        }
+
+        String direction = "DESC".equalsIgnoreCase(sortDir) ? "DESC" : "ASC";
+        sql.append(" ORDER BY ").append(sortColumn).append(" ").append(direction);
+        if (!"id".equals(sortColumn)) {
+            sql.append(", id ASC");
+        }
+        sql.append(" LIMIT ? OFFSET ?");
+
         params.add(limit > 0 ? limit : 20);
         params.add(offset >= 0 ? offset : 0);
 
@@ -95,7 +141,7 @@ public class UserDAOImpl implements UserDAO {
                 }
             }
         } catch (SQLException e) {
-            logger.error("Error fetching users list with filters", e);
+            logger.error("Error fetching users list with filters and sorting", e);
         }
         return list;
     }

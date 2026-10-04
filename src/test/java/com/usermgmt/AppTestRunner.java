@@ -187,6 +187,31 @@ public class AppTestRunner {
             failed++;
         }
 
+        // Test 8: User Sorting Functionality (Ascending/Descending across columns)
+        try {
+            System.out.print("[TEST 8] User Sorting by ID DESC and Full Name ASC... ");
+            List<User> sortedByIdDesc = userDAO.findAll(null, "ALL", "ALL", "id", "DESC", 0, 10);
+            if (sortedByIdDesc.size() >= 2) {
+                if (sortedByIdDesc.get(0).getId() < sortedByIdDesc.get(1).getId()) {
+                    throw new AssertionError("Expected ID DESC order, but first ID (" + sortedByIdDesc.get(0).getId() + ") < second ID (" + sortedByIdDesc.get(1).getId() + ")");
+                }
+            }
+
+            List<User> sortedByNameAsc = userService.listUsers(null, "ALL", "ALL", "full_name", "ASC", 1, 10);
+            if (sortedByNameAsc.size() >= 2) {
+                String first = sortedByNameAsc.get(0).getFullName().toLowerCase();
+                String second = sortedByNameAsc.get(1).getFullName().toLowerCase();
+                if (first.compareTo(second) > 0) {
+                    throw new AssertionError("Expected Name ASC order, but '" + first + "' > '" + second + "'");
+                }
+            }
+            System.out.println("PASSED (Sorted ID DESC and Name ASC validated)");
+            passed++;
+        } catch (Throwable t) {
+            System.out.println("FAILED: " + t.getMessage());
+            failed++;
+        }
+
         System.out.println("==================================================================");
         System.out.println("TEST SUMMARY: " + passed + " PASSED, " + failed + " FAILED");
         System.out.println("==================================================================");

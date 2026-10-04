@@ -18,6 +18,8 @@ public interface UserDAO {
 
     List<User> findAll(String search, String role, String status, int offset, int limit);
 
+    List<User> findAll(String search, String role, String status, String sortBy, String sortDir, int offset, int limit);
+
     int count(String search, String role, String status);
 
     boolean create(User user);

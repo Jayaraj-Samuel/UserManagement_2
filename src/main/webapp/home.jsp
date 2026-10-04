@@ -25,17 +25,103 @@
 </head>
 <body>
 
+    <!-- ====================================================================
+         App Sidebar (Hamburger Offcanvas Navigation Menu)
+         ==================================================================== -->
+    <div class="offcanvas offcanvas-start app-sidebar" tabindex="-1" id="appSidebar" aria-labelledby="appSidebarLabel">
+        <div class="offcanvas-header border-bottom py-3">
+            <div class="d-flex align-items-center gap-2">
+                <span class="logo-badge"><i class="bi bi-people-fill"></i></span>
+                <div>
+                    <h5 class="offcanvas-title brand-font fw-bold mb-0 text-dark" id="appSidebarLabel">UserSphere</h5>
+                    <span class="small text-muted" style="font-size: 0.72rem;">Enterprise Directory</span>
+                </div>
+            </div>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+
+        <div class="offcanvas-body d-flex flex-column justify-content-between p-0">
+            <div class="p-3">
+                <!-- User Profile Quick Card in Sidebar -->
+                <div class="sidebar-user-card p-3 mb-4 rounded-4" id="sidebarUserProfileCard" style="cursor: pointer;" title="Click to view full profile">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="avatar-circle avatar-lg" id="sidebarUserAvatar">
+                            <%= sessionUser.getFullName() != null && sessionUser.getFullName().length() >= 2 ? sessionUser.getFullName().substring(0, 2).toUpperCase() : "US" %>
+                        </div>
+                        <div class="overflow-hidden flex-grow-1">
+                            <div class="fw-bold text-truncate text-dark" id="sidebarUserName"><%= sessionUser.getFullName() %></div>
+                            <div class="small text-muted text-truncate" id="sidebarUserEmail"><%= sessionUser.getEmail() %></div>
+                            <div class="mt-1 d-flex align-items-center gap-2">
+                                <span class="badge bg-primary-subtle text-primary" style="font-size: 0.68rem;" id="sidebarUserRole"><%= sessionUser.getRole() %></span>
+                                <span class="badge bg-success-subtle text-success" style="font-size: 0.68rem;"><i class="bi bi-circle-fill me-1" style="font-size: 0.4rem;"></i>Online</span>
+                            </div>
+                        </div>
+                        <i class="bi bi-chevron-right text-muted small"></i>
+                    </div>
+                </div>
+
+                <!-- Navigation Section Title -->
+                <div class="sidebar-nav-title px-2 mb-2 text-uppercase text-muted fw-bold small" style="font-size: 0.7rem; letter-spacing: 0.08em;">Main Navigation</div>
+
+                <!-- Navigation List with Hamburger Menu Items: Dashboard, Profile, Users -->
+                <nav class="nav flex-column sidebar-nav gap-1">
+                    <!-- 1. Dashboard -->
+                    <a class="nav-link sidebar-link active" href="#dashboardSection" id="navItemDashboard">
+                        <div class="sidebar-icon-wrap"><i class="bi bi-speedometer2"></i></div>
+                        <span class="fw-semibold">Dashboard</span>
+                        <span class="badge bg-primary-subtle text-primary rounded-pill ms-auto small" id="sidebarTotalBadge">0</span>
+                    </a>
+
+                    <!-- 2. Profile -->
+                    <a class="nav-link sidebar-link" href="#" id="navItemProfile">
+                        <div class="sidebar-icon-wrap"><i class="bi bi-person-badge-fill"></i></div>
+                        <span class="fw-semibold">Profile</span>
+                        <span class="badge bg-light text-secondary border rounded-pill ms-auto small">My Account</span>
+                    </a>
+
+                    <!-- 3. Users -->
+                    <a class="nav-link sidebar-link" href="#usersTableSection" id="navItemUsers">
+                        <div class="sidebar-icon-wrap"><i class="bi bi-people-fill"></i></div>
+                        <span class="fw-semibold">Users</span>
+                        <span class="badge bg-secondary-subtle text-secondary rounded-pill ms-auto small">Directory</span>
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Sidebar Bottom: Status & 4. Sign Out -->
+            <div class="p-3 border-top bg-light-subtle">
+                <div class="d-flex align-items-center justify-content-between text-muted small px-1 mb-3">
+                    <span class="d-flex align-items-center gap-1"><i class="bi bi-shield-check text-success"></i> Session Active</span>
+                    <span class="badge bg-success-subtle text-success" id="sidebarDbBadge">Connected</span>
+                </div>
+                <!-- 4. Sign Out -->
+                <button type="button" class="btn btn-outline-danger w-100 rounded-3 d-flex align-items-center justify-content-center gap-2 py-2 fw-semibold shadow-sm" id="sidebarBtnLogout" title="Terminate current session">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Sign Out</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Sticky Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-custom">
         <div class="container-fluid px-lg-4">
-            <!-- Brand -->
-            <a class="navbar-brand" href="home.jsp">
-                <span class="logo-badge"><i class="bi bi-people-fill"></i></span>
-                <div>
-                    <div class="lh-1 brand-font">UserSphere</div>
-                    <span class="small text-muted fw-normal" style="font-size: 0.72rem;">Enterprise Directory</span>
-                </div>
-            </a>
+            <!-- Left Controls: Hamburger Menu Button & Brand -->
+            <div class="d-flex align-items-center">
+                <!-- Hamburger Button -->
+                <button class="btn hamburger-btn me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#appSidebar" aria-controls="appSidebar" aria-label="Toggle navigation menu" title="Open Navigation Menu">
+                    <i class="bi bi-list fs-4"></i>
+                </button>
+
+                <!-- Brand -->
+                <a class="navbar-brand mb-0" href="home.jsp">
+                    <span class="logo-badge"><i class="bi bi-people-fill"></i></span>
+                    <div>
+                        <div class="lh-1 brand-font">UserSphere</div>
+                        <span class="small text-muted fw-normal" style="font-size: 0.72rem;">Enterprise Directory</span>
+                    </div>
+                </a>
+            </div>
 
             <!-- Right Controls: DB status, user profile & logout -->
             <div class="d-flex align-items-center gap-3 ms-auto">
@@ -68,7 +154,7 @@
     <main class="container-fluid px-lg-5 py-4">
 
         <!-- Top Welcome & KPIs Section -->
-        <div class="row g-3 mb-4">
+        <div class="row g-3 mb-4" id="dashboardSection">
             <!-- Total Users -->
             <div class="col-12 col-sm-6 col-xl-3">
                 <div class="stat-card primary">
@@ -127,7 +213,7 @@
         </div>
 
         <!-- Main Card: User Management Grid -->
-        <div class="main-card">
+        <div class="main-card" id="usersTableSection">
             <!-- Header Controls -->
             <div class="main-card-header">
                 <div>
@@ -137,9 +223,9 @@
 
                 <div class="d-flex flex-wrap align-items-center gap-2">
                     <!-- Search Input -->
-                    <div class="input-group input-group-sm" style="max-width: 260px;">
+                    <div class="input-group input-group-sm" style="max-width: 220px;">
                         <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
-                        <input type="text" class="form-control border-start-0 ps-0" id="searchInput" placeholder="Search by name, email, user...">
+                        <input type="text" class="form-control border-start-0 ps-0" id="searchInput" placeholder="Search users...">
                     </div>
 
                     <!-- Role Filter -->
@@ -158,6 +244,27 @@
                         <option value="SUSPENDED">Suspended</option>
                     </select>
 
+                    <!-- Sorting Options: Sort By Field & Direction Toggle -->
+                    <div class="d-flex align-items-center gap-1">
+                        <div class="input-group input-group-sm" style="width: auto;">
+                            <span class="input-group-text bg-white text-muted" title="Sort Criteria"><i class="bi bi-filter-left"></i></span>
+                            <select class="form-select form-select-sm" id="sortBySelect" style="width: auto;" title="Select field to sort by">
+                                <option value="id" selected>Sort by ID</option>
+                                <option value="full_name">Sort by Name</option>
+                                <option value="username">Sort by Username</option>
+                                <option value="email">Sort by Email</option>
+                                <option value="department">Sort by Department</option>
+                                <option value="role">Sort by Role</option>
+                                <option value="status">Sort by Status</option>
+                                <option value="created_at">Sort by Date Joined</option>
+                            </select>
+                        </div>
+                        <button type="button" class="btn btn-outline-secondary btn-sm rounded-3 d-flex align-items-center gap-1" id="btnSortDirection" title="Sort Direction: Ascending (Click to toggle)">
+                            <i class="bi bi-sort-numeric-down" id="sortDirectionIcon"></i>
+                            <span id="sortDirectionText" class="d-none d-md-inline small fw-semibold">ASC</span>
+                        </button>
+                    </div>
+
                     <!-- Refresh Button -->
                     <button type="button" class="btn btn-outline-secondary btn-sm rounded-3" id="btnRefresh" title="Refresh Table">
                         <i class="bi bi-arrow-clockwise"></i>
@@ -171,17 +278,47 @@
                 </div>
             </div>
 
-            <!-- Table Grid -->
+            <!-- Table Grid with Interactive Sortable Column Headers -->
             <div class="table-responsive">
                 <table class="table table-custom table-hover align-middle">
                     <thead>
                         <tr>
-                            <th scope="col" style="width: 105px;"># / ID</th>
-                            <th scope="col">User</th>
-                            <th scope="col">Email Address</th>
-                            <th scope="col">Department</th>
-                            <th scope="col">Role</th>
-                            <th scope="col">Status</th>
+                            <th scope="col" class="sortable-th active-sort" data-sort="id" style="width: 110px;" title="Click to sort by ID">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span># / ID</span>
+                                    <i class="bi bi-sort-numeric-down sort-th-icon"></i>
+                                </div>
+                            </th>
+                            <th scope="col" class="sortable-th" data-sort="full_name" title="Click to sort by Name">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span>User</span>
+                                    <i class="bi bi-arrow-down-up sort-th-icon text-muted"></i>
+                                </div>
+                            </th>
+                            <th scope="col" class="sortable-th" data-sort="email" title="Click to sort by Email">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span>Email Address</span>
+                                    <i class="bi bi-arrow-down-up sort-th-icon text-muted"></i>
+                                </div>
+                            </th>
+                            <th scope="col" class="sortable-th" data-sort="department" title="Click to sort by Department">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span>Department</span>
+                                    <i class="bi bi-arrow-down-up sort-th-icon text-muted"></i>
+                                </div>
+                            </th>
+                            <th scope="col" class="sortable-th" data-sort="role" title="Click to sort by Role">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span>Role</span>
+                                    <i class="bi bi-arrow-down-up sort-th-icon text-muted"></i>
+                                </div>
+                            </th>
+                            <th scope="col" class="sortable-th" data-sort="status" title="Click to sort by Status">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span>Status</span>
+                                    <i class="bi bi-arrow-down-up sort-th-icon text-muted"></i>
+                                </div>
+                            </th>
                             <th scope="col" class="text-end" style="width: 140px;">Actions</th>
                         </tr>
                     </thead>
@@ -386,7 +523,11 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer d-flex justify-content-between">
+                    <button type="button" class="btn btn-outline-primary btn-sm d-flex align-items-center gap-1" id="viewModalEditBtn">
+                        <i class="bi bi-pencil-square"></i>
+                        <span>Edit Profile</span>
+                    </button>
                     <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>

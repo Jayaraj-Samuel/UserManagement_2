@@ -7,6 +7,8 @@ let currentUser = null;
 let currentPage = 1;
 let currentPageSize = 10;
 let searchTimer = null;
+let currentSortBy = "id";
+let currentSortDir = "ASC";
 
 $(document).ready(function () {
     // 1. Verify Active Session & User Profile
@@ -27,6 +29,37 @@ $(document).ready(function () {
         loadUsersGrid();
     });
 
+    // 3. Sorting Option Event Listeners
+    $("#sortBySelect").on("change", function () {
+        currentSortBy = $(this).val();
+        currentPage = 1;
+        updateSortDirectionButton();
+        loadUsersGrid();
+    });
+
+    $("#btnSortDirection").on("click", function () {
+        currentSortDir = (currentSortDir === "ASC" ? "DESC" : "ASC");
+        updateSortDirectionButton();
+        currentPage = 1;
+        loadUsersGrid();
+    });
+
+    // Sortable column headers click listener
+    $(document).on("click", ".sortable-th", function () {
+        const column = $(this).data("sort");
+        if (!column) return;
+        if (currentSortBy === column) {
+            currentSortDir = (currentSortDir === "ASC" ? "DESC" : "ASC");
+        } else {
+            currentSortBy = column;
+            currentSortDir = "ASC";
+        }
+        $("#sortBySelect").val(currentSortBy);
+        updateSortDirectionButton();
+        currentPage = 1;
+        loadUsersGrid();
+    });
+
     $("#btnRefresh").on("click", function () {
         $(this).find("i").addClass("spin");
         loadUsersGrid();
@@ -34,18 +67,94 @@ $(document).ready(function () {
         setTimeout(() => $(this).find("i").removeClass("spin"), 800);
     });
 
-    // 3. User Modal Forms
+    // 4. User Modal Forms
     $("#btnAddUser").on("click", openAddUserModal);
     $("#saveAddUserBtn").on("click", submitAddUser);
     $("#saveEditUserBtn").on("click", submitEditUser);
     $("#confirmDeleteBtn").on("click", submitDeleteUser);
 
-    // 4. Logout Action
+    // 5. Hamburger Menu / Sidebar Nav Listeners
+    // Menu item: Dashboard
+    $("#navItemDashboard").on("click", function (e) {
+        e.preventDefault();
+        closeSidebar();
+        $(".sidebar-link").removeClass("active");
+        $("#navItemDashboard").addClass("active");
+        const target = document.getElementById("dashboardSection");
+        if (target) {
+            target.scrollIntoView({ behavior: "smooth" });
+            $(target).addClass("section-highlight");
+            setTimeout(() => $(target).removeClass("section-highlight"), 1200);
+        }
+    });
+
+    // Menu item: Profile
+    $("#navItemProfile, #sidebarUserProfileCard").on("click", function (e) {
+        e.preventDefault();
+        closeSidebar();
+        $(".sidebar-link").removeClass("active");
+        $("#navItemProfile").addClass("active");
+        if (currentUser && currentUser.id) {
+            viewUser(currentUser.id);
+        }
+    });
+
+    // Menu item: Users
+    $("#navItemUsers").on("click", function (e) {
+        e.preventDefault();
+        closeSidebar();
+        $(".sidebar-link").removeClass("active");
+        $("#navItemUsers").addClass("active");
+        const target = document.getElementById("usersTableSection");
+        if (target) {
+            target.scrollIntoView({ behavior: "smooth" });
+            $(target).addClass("section-highlight");
+            setTimeout(() => $(target).removeClass("section-highlight"), 1200);
+        }
+    });
+
+    // Menu item: Sign Out
+    $("#sidebarBtnLogout").on("click", function (e) {
+        e.preventDefault();
+        closeSidebar();
+        performLogout();
+    });
+
+    // Profile modal edit button shortcut
+    $("#viewModalEditBtn").on("click", function () {
+        const modalEl = document.getElementById("viewUserModal");
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        if (modal) modal.hide();
+        const id = $(modalEl).data("userId");
+        if (id) {
+            editUser(id);
+        }
+    });
+
+    // 6. Header Logout Action
     $("#btnLogout").on("click", function (e) {
         e.preventDefault();
         performLogout();
     });
 });
+
+function closeSidebar() {
+    const offcanvasEl = document.getElementById("appSidebar");
+    if (offcanvasEl) {
+        const offcanvas = bootstrap.Offcanvas.getInstance(offcanvasEl);
+        if (offcanvas) offcanvas.hide();
+    }
+}
+
+function updateSortDirectionButton() {
+    const isAsc = (currentSortDir === "ASC");
+    const isNumeric = (currentSortBy === "id" || currentSortBy === "created_at");
+    let iconClass = isNumeric ? (isAsc ? "bi-sort-numeric-down" : "bi-sort-numeric-up-alt")
+                              : (isAsc ? "bi-sort-alpha-down" : "bi-sort-alpha-up-alt");
+    $("#sortDirectionIcon").attr("class", "bi " + iconClass);
+    $("#sortDirectionText").text(currentSortDir);
+    $("#btnSortDirection").attr("title", "Sort Direction: " + (isAsc ? "Ascending" : "Descending") + " (Click to toggle)");
+}
 
 /**
  * Validates and retrieves current session details from server
@@ -80,6 +189,12 @@ function renderCurrentUserProfile(user) {
     $("#currentUserRole").text(user.role);
     $("#currentUserAvatar").text((user.fullName || user.username).substring(0, 2).toUpperCase());
 
+    // Sidebar user details
+    $("#sidebarUserName").text(user.fullName || user.username);
+    $("#sidebarUserEmail").text(user.email || "");
+    $("#sidebarUserRole").text(user.role);
+    $("#sidebarUserAvatar").text((user.fullName || user.username).substring(0, 2).toUpperCase());
+
     // Role-based UI customizations
     if (user.role === "USER") {
         $("#btnAddUser").hide(); // Regular users cannot add users
@@ -100,15 +215,18 @@ function loadDashboardStats() {
             if (res && res.success && res.data) {
                 const s = res.data;
                 $("#statTotalUsers").text(s.totalUsers || 0);
+                $("#sidebarTotalBadge").text(s.totalUsers || 0);
                 $("#statActiveUsers").text(s.activeUsers || 0);
                 $("#statInactiveUsers").text(s.inactiveUsers || 0);
                 $("#statAdminUsers").text(s.adminUsers || 0);
 
                 if (s.databaseEngine) {
                     $("#dbEngineBadge").html('<i class="bi bi-database-check me-1"></i>' + s.databaseEngine);
+                    $("#sidebarDbBadge").text(s.isFallback ? "H2 (MySQL Mode)" : "MySQL Connected");
                     if (s.isFallback) {
                         $("#dbEngineBadge").removeClass("bg-success").addClass("bg-warning text-dark")
                             .attr("title", "MySQL was not active, so embedded H2 MySQL-mode engaged automatically.");
+                        $("#sidebarDbBadge").removeClass("bg-success-subtle text-success").addClass("bg-warning-subtle text-warning-emphasis");
                     }
                 }
             }
@@ -117,7 +235,7 @@ function loadDashboardStats() {
 }
 
 /**
- * Loads the users table grid with pagination and filter criteria
+ * Loads the users table grid with pagination, filters, and sorting criteria
  */
 function loadUsersGrid() {
     const search = $("#searchInput").val().trim();
@@ -134,6 +252,8 @@ function loadUsersGrid() {
             search: search,
             role: role,
             status: status,
+            sortBy: currentSortBy,
+            sortDir: currentSortDir,
             page: currentPage,
             pageSize: currentPageSize
         },
@@ -165,6 +285,20 @@ function renderUsersTable(data) {
     currentPage = data.currentPage || 1;
 
     $("#totalUsersCountDisplay").text(totalCount + " total users found");
+
+    // Sync table headers active sort icon and class
+    $(".sortable-th").removeClass("active-sort");
+    $(".sortable-th .sort-th-icon").attr("class", "bi bi-arrow-down-up sort-th-icon text-muted");
+
+    const activeTh = $(`.sortable-th[data-sort="${currentSortBy}"]`);
+    if (activeTh.length) {
+        activeTh.addClass("active-sort");
+        const isNumeric = (currentSortBy === "id" || currentSortBy === "created_at");
+        const isAsc = (currentSortDir === "ASC");
+        let activeIcon = isNumeric ? (isAsc ? "bi-sort-numeric-down" : "bi-sort-numeric-up-alt")
+                                   : (isAsc ? "bi-sort-alpha-down" : "bi-sort-alpha-up-alt");
+        activeTh.find(".sort-th-icon").attr("class", `bi ${activeIcon} sort-th-icon`);
+    }
 
     if (users.length === 0) {
         tbody.html('<tr><td colspan="7" class="text-center py-5 text-muted"><i class="bi bi-people fs-2 d-block mb-2 text-secondary"></i>No users found matching current filters.</td></tr>');
@@ -515,6 +649,9 @@ function viewUser(id) {
         success: function (res) {
             if (res && res.success && res.data) {
                 const u = res.data;
+                const modalEl = document.getElementById("viewUserModal");
+                $(modalEl).data("userId", u.id);
+
                 $("#viewAvatar").text((u.fullName || u.username).substring(0, 2).toUpperCase());
                 $("#viewFullName").text(u.fullName);
                 $("#viewUsername").text("@" + u.username);
@@ -526,7 +663,15 @@ function viewUser(id) {
                 $("#viewCreatedAt").text(u.createdAt ? new Date(u.createdAt).toLocaleString() : "—");
                 $("#viewUpdatedAt").text(u.updatedAt ? new Date(u.updatedAt).toLocaleString() : "—");
 
-                const modal = new bootstrap.Modal(document.getElementById("viewUserModal"));
+                // Toggle edit button permissions
+                const canEdit = currentUser && (currentUser.role === "ADMIN" || currentUser.role === "MANAGER" || currentUser.id === u.id);
+                if (canEdit) {
+                    $("#viewModalEditBtn").show();
+                } else {
+                    $("#viewModalEditBtn").hide();
+                }
+
+                const modal = new bootstrap.Modal(modalEl);
                 modal.show();
             }
         }
